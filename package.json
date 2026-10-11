@@ -1,21 +1,19 @@
 {
-  "name": "fspy",
-  "version": "1.1.0-beta.3",
+  "name": "fspy-splicer",
+  "version": "1.1.0-arm64.1",
   "main": "build/main.js",
-  "homepage": "https://fspy.io",
+  "homepage": "https://github.com/splicergroup/fSpy",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stuffmatic/fSpy.git"
+    "url": "https://github.com/splicergroup/fSpy.git"
   },
   "author": {
-    "name": "Per Gantelius",
-    "email": "per@stuffmatic.com",
-    "url": "https://stuffmatic.com"
+    "name": "Ryan Hussain",
+    "email": "ryan@splicer.tv"
   },
-  "description": "An open source, cross platform app for still image camera matching",
+  "description": "Modified build of fSpy, an open source app for still image camera matching, updated for Apple Silicon",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@types/electron-window-state": "^2.0.33",
     "@types/minimist": "^1.2.0",
     "@types/jest": "^23.0.0",
     "@types/react": "^16.3.16",
@@ -29,8 +27,8 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "css-loader": "^0.28.11",
-    "electron": "^8.2.1",
-    "electron-builder": "^22.4.0",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^23.1.0",
     "jest-junit": "^5.0.0",
@@ -38,20 +36,20 @@
     "standard-loader": "^6.0.1",
     "style-loader": "^0.21.0",
     "trash-cli": "^1.4.0",
-    "ts-loader": "^4.3.1",
-    "tslint": "^5.10.0",
+    "ts-loader": "^8.4.0",
+    "tslint": "^6.1.3",
     "tslint-config-standard": "^7.0.0",
     "tslint-loader": "^3.6.0",
-    "typescript": "^2.9.1",
+    "typescript": "^4.9.5",
     "webpack": "^4.10.2",
     "webpack-cli": "^3.0.1",
     "webpack-dev-server": "^3.1.4"
   },
   "scripts": {
     "prebuild-dev": "trash build",
-    "build-dev": "webpack --config webpack.config.js --mode development",
+    "build-dev": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.config.js --mode development",
     "prebuild-dist": "trash build",
-    "build-dist": "webpack --config webpack.config.js --mode production",
+    "build-dist": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.config.js --mode production",
     "predist": "yarn run build-dist",
     "predist-preview": "yarn run build-dist",
     "dist-preview": "electron-builder --dir",
@@ -63,11 +61,12 @@
     "dist": "electron-builder -mwl",
     "test": "jest",
     "prepublish-release": "yarn build-dist",
-    "publish-release": "electron-builder -mwl --publish always"
+    "publish-release": "electron-builder -mwl --publish always",
+    "dist-mac-arm64": "yarn run build-dist && electron-builder --mac dmg zip --arm64"
   },
   "dependencies": {
     "minimist": "^1.2.0",
-    "electron-window-state": "^4.1.1",
+    "electron-window-state": "^5.0.3",
     "konva": "^2.1.3",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
@@ -81,13 +80,19 @@
     "publish": {
       "provider": "github",
       "repo": "fSpy",
-      "publishAutoUpdate": false
+      "publishAutoUpdate": false,
+      "owner": "splicergroup"
     },
     "productName": "fSpy",
-    "appId": "com.stuffmatic.fspy",
+    "appId": "tv.splicer.fspy",
     "mac": {
-      "target": "dmg",
-      "category": "public.app-category.utilities"
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities",
+      "identity": "-",
+      "hardenedRuntime": false
     },
     "linux": {
       "target": [
@@ -157,7 +162,8 @@
         "description": "fSpy project file",
         "role": "Editor"
       }
-    ]
+    ],
+    "copyright": "Copyright © 2020 Per Gantelius; modifications © 2026 Ryan Hussain"
   },
   "jest": {
     "testRegex": "/__tests__/.*\\.jsx?",
@@ -169,5 +175,12 @@
     "classNameTemplate": "{classname}-{title}",
     "titleTemplate": "{classname}-{title}",
     "usePathForSuiteName": "true"
-  }
+  },
+  "contributors": [
+    {
+      "name": "Per Gantelius",
+      "email": "per@stuffmatic.com",
+      "url": "https://stuffmatic.com"
+    }
+  ]
 }

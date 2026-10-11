@@ -16,7 +16,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* Theme colors. Dark values apply when the OS (or View > Appearance) is dark. */
+:root {
+  color-scheme: light;
+  --panel-bg: #ececec;
+  --panel-text: #1d1d1f;
+  --panel-border: #e0e0e0;
+  --input-bg: #ffffff;
+  --input-border: #e1e1e1;
+  --button-bg: #ffffff;
+  --button-bg-active: #d8d8d8;
+  --button-border: #c8c8c8;
+  --menu-hover-bg: #eef4fd;
+  --copy-button-bg: #e8e8e8;
+  --copy-button-bg-active: #c0c0c0;
+  --copy-button-text: #909090;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --panel-bg: #1f2427;
+    --panel-text: #e3e5e6;
+    --panel-border: #333a3e;
+    --input-bg: #2a3034;
+    --input-border: #3d464b;
+    --button-bg: #343b3f;
+    --button-bg-active: #454e53;
+    --button-border: #454e53;
+    --menu-hover-bg: #343b3f;
+    --copy-button-bg: #343b3f;
+    --copy-button-bg-active: #454e53;
+    --copy-button-text: #a0a6a9;
+  }
+}
+
 body {
+  background-color: var(--panel-bg);
   margin: 0;
   padding: 0;
   user-select: none;
@@ -25,7 +61,22 @@ body {
 textarea, body, button, input {
   font: caption;
   font-size: 12px;
-  color: WindowText;
+  color: var(--panel-text);
+}
+
+input[type='text'], textarea {
+  background-color: var(--input-bg);
+}
+
+button {
+  background-color: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+button:active {
+  background-color: var(--button-bg-active);
 }
 
 textarea {
@@ -87,7 +138,12 @@ textarea {
 }
 
 .side-panel {
-  background-color: Menu;
+  background-color: var(--panel-bg);
+  color: var(--panel-text);
+}
+
+.dropdown-cell:hover {
+  background-color: var(--menu-hover-bg) !important;
 }
 
 .panel-group-title {
@@ -100,11 +156,11 @@ textarea {
 }
 
 .bottom-border {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .top-border {
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--panel-border);
 }
 
 :not(input):not(textarea),
@@ -120,13 +176,13 @@ textarea {
 }
 
 .copy-button {
-  background-color: #e8e8e8;
-  color: #909090;
+  background-color: var(--copy-button-bg);
+  color: var(--copy-button-text);
   outline: none;
   border: none;
   box-shadow: none;
 }
 
 .copy-button:active {
-  background-color: #c0c0c0;
+  background-color: var(--copy-button-bg-active);
 }

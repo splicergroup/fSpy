@@ -1,3 +1,40 @@
+## About this build
+
+This is a modified version of [fSpy](https://github.com/stuffmatic/fSpy) by Per Gantelius, maintained by Ryan Hussain. It is not an official fSpy release. It is distributed under the same GPL-3.0 license; see [CHANGES.md](CHANGES.md) for what was changed.
+
+Changes from the original:
+
+- Runs natively on Apple Silicon Macs (Electron upgraded from 8 to 44)
+- Dark theme, selectable under **View → Appearance** (follows the system setting by default)
+- Copy and paste work in text fields, and the result panel's Copy buttons work again
+
+### Installing on macOS (Apple Silicon)
+
+This build is not notarized by Apple, so macOS asks you to approve it once:
+
+1. Open the `.dmg` and drag **fSpy** to Applications.
+2. Open fSpy. macOS warns that it can't verify the app. Click **Done**.
+3. Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to fSpy. Confirm with your password.
+
+Alternatively, run this in Terminal after copying the app to Applications:
+
+```
+xattr -dr com.apple.quarantine /Applications/fSpy.app
+```
+
+Each release lists SHA-256 checksums. To check your download, run `shasum -a 256` on the file and compare.
+
+### Building on macOS (Apple Silicon)
+
+Requires Node.js 22. From the repository root:
+
+```
+npx yarn@1.22.22 install --ignore-optional
+npx yarn@1.22.22 run dist-mac-arm64
+```
+
+The app is written to `dist/mac-arm64/fSpy.app`, along with a `.dmg` and `.zip`. Apps you build yourself open without the approval step.
+
 ## What is this?
 
 fSpy is an open source, cross platform app for still image camera matching. See [fspy.io](https://fspy.io) for more info. The source code is available under the GPL license.

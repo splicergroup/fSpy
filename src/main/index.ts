@@ -16,21 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, Menu, clipboard, nativeTheme } from 'electron'
 import { OpenProjectMessage, OpenImageMessage, SaveProjectMessage, SaveProjectAsMessage, NewProjectMessage, ExportMessage, ExportType, SetSidePanelVisibilityMessage } from './ipc-messages'
 const path = require('path')
 const url = require('url')
 
 import windowStateKeeper from 'electron-window-state'
-import { SpecifyProjectPathMessage, SpecifyExportPathMessage, SetDocumentStateMessage, OpenDroppedProjectMessage } from '../gui/ipc-messages'
+import { SpecifyProjectPathMessage, SpecifyExportPathMessage, SetDocumentStateMessage, OpenDroppedProjectMessage, ShowErrorBoxMessage, GetAppVersionMessage, CopyToClipboardMessage } from '../gui/ipc-messages'
 import { basename, join } from 'path'
-import AppMenuManager from './app-menu-manager'
+import AppMenuManager, { Appearance } from './app-menu-manager'
 import ProjectFile from '../gui/io/project-file'
 import { Palette } from '../gui/style/palette'
-import { openSync, writeSync, closeSync } from 'fs'
+import { openSync, writeSync, closeSync, readFileSync, writeFileSync } from 'fs'
 import { CLI } from '../cli/cli'
-
-app.allowRendererProcessReuse = true
 
 let mainWindow: Electron.BrowserWindow | null = null
 
@@ -45,8 +43,36 @@ let documentState: DocumentState | null = null
 let initialOpenMessage: OpenProjectMessage | null = null
 let windowHasAppeared = false
 
+let appearance: Appearance = 'system'
+
+function preferencesPath() {
+  return join(app.getPath('userData'), 'preferences.json')
+}
+
+function loadAppearance() {
+  try {
+    const preferences = JSON.parse(readFileSync(preferencesPath(), 'utf8'))
+    if (['system', 'light', 'dark'].indexOf(preferences.appearance) >= 0) {
+      appearance = preferences.appearance
+    }
+  } catch (error) {
+    // No saved preferences yet, use the default
+  }
+  nativeTheme.themeSource = appearance
+}
+
+function setAppearance(value: Appearance) {
+  appearance = value
+  nativeTheme.themeSource = value
+  try {
+    writeFileSync(preferencesPath(), JSON.stringify({ appearance: value }))
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // macOS only
-app.on('open-file', (event: Event, filePath: string) => {
+app.on('open-file', (event: Electron.Event, filePath: string) => {
   if (mainWindow === null) {
     initialOpenMessage = new OpenProjectMessage(filePath, false)
     if (windowHasAppeared) {
@@ -104,7 +130,8 @@ function createWindow() {
     webPreferences: {
       // Allow loading local files in dev mode
       webSecurity: process.env.DEV === undefined,
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false
     }
   })
 
@@ -248,8 +275,12 @@ function createWindow() {
           new SetSidePanelVisibilityMessage(true)
         )
         window.setFullScreen(false)
+      },
+      onSetAppearance: (value: Appearance) => {
+        setAppearance(value)
       }
-    }
+    },
+    appearance
   )
 
   // Prevent following links, e.g when they are dropped
@@ -340,7 +371,7 @@ function createWindow() {
   Menu.setApplicationMenu(appMenuManager.menu)
   appMenuManager.setExitFullScreenItemEnabled(false)
 
-  window.on('close', (event: Event) => {
+  window.on('close', (event: Electron.Event) => {
     showDiscardChangesDialogIfNeeded(window, (didCancel: boolean) => {
       if (didCancel) {
         event.preventDefault()
@@ -361,13 +392,13 @@ function createWindow() {
     })
   })
 
-  window.on('enter-full-screen', (_: Event) => {
+  window.on('enter-full-screen', () => {
     appMenuManager.setEnterFullScreenItemEnabled(false)
     appMenuManager.setExitFullScreenItemEnabled(true)
     window.setMenuBarVisibility(false)
   })
 
-  window.on('leave-full-screen', (_: Event) => {
+  window.on('leave-full-screen', () => {
     window.webContents.send(
       SetSidePanelVisibilityMessage.type,
       new SetSidePanelVisibilityMessage(true)
@@ -518,6 +549,7 @@ app.on('ready', () => {
     process.exit()
   } else {
     // We're in GUI mode.
+    loadAppearance()
     createWindow()
   }
 })
@@ -537,4 +569,16 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.on(ShowErrorBoxMessage.type, (_: any, message: ShowErrorBoxMessage) => {
+  dialog.showErrorBox(message.title, message.content)
+})
+
+ipcMain.on(GetAppVersionMessage.type, (event: Electron.IpcMainEvent) => {
+  event.returnValue = app.getVersion()
+})
+
+ipcMain.on(CopyToClipboardMessage.type, (_: any, message: CopyToClipboardMessage) => {
+  clipboard.writeText(message.text)
 })

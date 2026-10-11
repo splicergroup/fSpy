@@ -72,7 +72,7 @@ export default class NumericInputField extends React.Component<NumericInputField
       outline: 'none',
       width: '60px',
       paddingLeft: '6px',
-      border: '1px solid ' + Palette.gray
+      border: '1px solid ' + Palette.inputBorderColor
     }
 
     if (this.props.isDisabled) {

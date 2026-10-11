@@ -32,6 +32,12 @@ export class Palette {
   static readonly imagePanelBackgroundColor = '#252B2E'
   static readonly disabledTextColor = '#909090'
 
+  // Side panel UI colors, defined as CSS variables in index.css
+  // so they follow the light/dark theme. Not usable in canvas drawing.
+  static readonly panelTextColor = 'var(--panel-text)'
+  static readonly inputBackgroundColor = 'var(--input-bg)'
+  static readonly inputBorderColor = 'var(--input-border)'
+
   // Color aliases
   static readonly xAxisColor = Palette.red
   static readonly yAxisColor = Palette.green

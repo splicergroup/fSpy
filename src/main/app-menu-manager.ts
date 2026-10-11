@@ -30,13 +30,16 @@ export interface AppMenuCallbacks {
   onExportProjectImage(): void
   onEnterFullScreenMode(): void
   onExitFullScreenMode(): void
+  onSetAppearance(appearance: Appearance): void
 }
+
+export type Appearance = 'system' | 'light' | 'dark'
 
 export default class AppMenuManager {
   readonly menu: Menu
   readonly callbacks: AppMenuCallbacks
 
-  constructor(callbacks: AppMenuCallbacks) {
+  constructor(callbacks: AppMenuCallbacks, appearance: Appearance) {
     this.callbacks = callbacks
 
     let newItem = {
@@ -149,8 +152,36 @@ export default class AppMenuManager {
       submenu: fileMenuItems
     }
 
-    let menus = [fileMenu]
-    let viewMenu = {
+    // Provides the standard text editing shortcuts (copy, paste etc).
+    // On macOS these only work in text fields if present in the app menu.
+    let editMenu: Electron.MenuItemConstructorOptions = {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'delete' },
+        { type: 'separator' },
+        { role: 'selectAll' }
+      ]
+    }
+
+    const appearanceItem = (label: string, value: Appearance): Electron.MenuItemConstructorOptions => {
+      return {
+        label: label,
+        type: 'radio',
+        checked: appearance === value,
+        click: () => {
+          this.callbacks.onSetAppearance(value)
+        }
+      }
+    }
+
+    let menus: Electron.MenuItemConstructorOptions[] = [fileMenu, editMenu]
+    let viewMenu: Electron.MenuItemConstructorOptions = {
       label: 'View',
       submenu: [
         {
@@ -168,6 +199,15 @@ export default class AppMenuManager {
           click: () => {
             this.callbacks.onExitFullScreenMode()
           }
+        },
+        { type: 'separator' },
+        {
+          label: 'Appearance',
+          submenu: [
+            appearanceItem('Use system setting', 'system'),
+            appearanceItem('Light', 'light'),
+            appearanceItem('Dark', 'dark')
+          ]
         }
       ]
     }
@@ -186,22 +226,22 @@ export default class AppMenuManager {
   }
 
   setOpenImageItemEnabled(enabled: boolean) {
-    this.menu.getMenuItemById('open-image').enabled = enabled
+    this.menu.getMenuItemById('open-image')!.enabled = enabled
   }
 
   setSaveItemEnabled(enabled: boolean) {
-    this.menu.getMenuItemById('save').enabled = enabled
+    this.menu.getMenuItemById('save')!.enabled = enabled
   }
 
   setSaveAsItemEnabled(enabled: boolean) {
-    this.menu.getMenuItemById('save-as').enabled = enabled
+    this.menu.getMenuItemById('save-as')!.enabled = enabled
   }
 
   setEnterFullScreenItemEnabled(enabled: boolean) {
-    this.menu.getMenuItemById('enter-full-screen').enabled = enabled
+    this.menu.getMenuItemById('enter-full-screen')!.enabled = enabled
   }
 
   setExitFullScreenItemEnabled(enabled: boolean) {
-    this.menu.getMenuItemById('exit-full-screen').enabled = enabled
+    this.menu.getMenuItemById('exit-full-screen')!.enabled = enabled
   }
 }

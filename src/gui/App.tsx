@@ -28,7 +28,8 @@ import { GlobalSettings } from './types/global-settings'
 import { UIState } from './types/ui-state'
 import { ImageState } from './types/image-state'
 import { SolverResult } from './solver/solver-result'
-import { ipcRenderer, remote } from 'electron'
+import { ipcRenderer, webUtils } from 'electron'
+import { showErrorBox } from './io/dialogs'
 import { NewProjectMessage, OpenProjectMessage, SaveProjectMessage, SaveProjectAsMessage, OpenImageMessage, ExportMessage, ExportType, SetSidePanelVisibilityMessage } from '../main/ipc-messages'
 import ProjectFile from './io/project-file'
 import { readFileSync } from 'fs'
@@ -83,7 +84,7 @@ class App extends React.PureComponent<AppProps> {
       if (ev.dataTransfer != null) {
         let firstFile = ev.dataTransfer.files[0]
         if (firstFile) {
-          let filePath = firstFile.path
+          let filePath = webUtils.getPathForFile(firstFile)
           let isProjectFile = ProjectFile.isProjectFile(filePath)
           if (isProjectFile) {
             this.props.onProjectFileDropped(filePath)
@@ -166,7 +167,7 @@ export function mapDispatchToProps(dispatch: Dispatch<AppAction>) {
           dispatch(setImage(url, imageBuffer, width, height))
         },
         () => {
-          remote.dialog.showErrorBox(
+          showErrorBox(
             'Failed to load image data',
             'Could not load the image data. Is this a valid image file?'
           )

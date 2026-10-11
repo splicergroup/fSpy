@@ -65,7 +65,8 @@ const menuContainerStyle = {
 
 const menuCellStyle: any = {
   textAlign: 'left',
-  backgroundColor: Palette.white,
+  backgroundColor: Palette.inputBackgroundColor,
+  color: Palette.panelTextColor,
   width: '100%',
   padding: 0,
   paddingLeft: '5px',
@@ -76,7 +77,7 @@ const menuCellStyle: any = {
 }
 
 const menuTitleStyle = {
-  border: '1px solid ' + Palette.gray
+  border: '1px solid ' + Palette.inputBorderColor
 }
 
 // https://blog.logrocket.com/building-a-custom-dropdown-menu-component-for-react-e94f02ced4a1
@@ -135,7 +136,7 @@ export default class Dropdown<T> extends React.PureComponent<DropdownProps<T>, D
 
   private renderMenu() {
     let scrollContainerStyle: any = {
-      border: '1px solid ' + Palette.gray,
+      border: '1px solid ' + Palette.inputBorderColor,
       maxHeight: '133px',
       overflowX: 'hidden',
       overflowY: 'scroll',
@@ -198,11 +199,11 @@ export default class Dropdown<T> extends React.PureComponent<DropdownProps<T>, D
     }
 
     return (
-      <button style={ { ...menuCellStyle, display: 'flex', alignItems: 'center' }} key={index} onClick={(_) => clickHandler()}>
+      <button className='dropdown-cell' style={ { ...menuCellStyle, display: 'flex', alignItems: 'center' }} key={index} onClick={(_) => clickHandler()}>
         <div style={{ ...circleStyle, ...markerStyle }} />
         <div style={{ ...titleStyle, flexGrow: '100' }}>{option.title}</div>
         <svg style={{ display: 'inline-block', width: 12, height: 5 }}>
-          <polyline points={'0,0, 3,3, 6,0'} stroke={ index < 0 ? (this.props.disabled ? Palette.disabledTextColor : Palette.black) : 'none' } fill={ 'none' } />
+          <polyline points={'0,0, 3,3, 6,0'} stroke={ index < 0 ? (this.props.disabled ? Palette.disabledTextColor : Palette.panelTextColor) : 'none' } fill={ 'none' } />
         </svg>
       </button>
     )
