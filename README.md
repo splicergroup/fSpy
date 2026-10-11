@@ -8,6 +8,12 @@ Changes from the original:
 - Dark theme, selectable under **View → Appearance** (follows the system setting by default)
 - Copy and paste work in text fields, and the result panel's Copy buttons work again
 
+![fSpy with the dark theme](screenshot-dark.jpg)
+
+Switch between the system setting, light and dark themes under **View → Appearance**:
+
+![The View → Appearance menu](screenshot-appearance-menu.jpg)
+
 ### Installing on macOS (Apple Silicon)
 
 This build is not notarized by Apple, so macOS asks you to approve it once:
